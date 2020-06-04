@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 @SpringBootApplication
 public class ClientApplication {
 	private static final ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
-	public static final String SYSTEM_OUT_TXT = "system_out.txt";
+	public static final String SYSTEM_OUT_TXT = "system_out.log";
 
 	public static void main(String[] args) throws FileNotFoundException {
 		cachedThreadPool.execute(new Runnable() {
