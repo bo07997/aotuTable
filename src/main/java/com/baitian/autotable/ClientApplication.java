@@ -16,19 +16,16 @@ import java.util.concurrent.Executors;
 @SpringBootApplication
 public class ClientApplication {
 	private static final ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
-	public static final String SYSTEM_OUT_TXT = "system_out.log";
+	private static final String SYSTEM_OUT_TXT = "system_out.log";
 
 	public static void main(String[] args) throws FileNotFoundException {
-		cachedThreadPool.execute(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					File file = new File(SYSTEM_OUT_TXT);
-					file.delete();
-					System.setOut(new PrintStream(new FileOutputStream(SYSTEM_OUT_TXT)));
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				}
+		cachedThreadPool.execute(() -> {
+			try {
+				File file = new File(SYSTEM_OUT_TXT);
+				file.delete();
+				System.setOut(new PrintStream(new FileOutputStream(SYSTEM_OUT_TXT)));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
 			}
 		});
 		SpringApplication.run(ClientApplication.class, args);
