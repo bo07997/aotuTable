@@ -7,6 +7,7 @@ import com.baitian.autotable.service.tf.service.TFService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,7 +35,9 @@ public class ClientService {
 	public String autoTable1(String branch, String name) {
 		StringBuilder buffer = new StringBuilder();
 		try {
-			checkout(branch, buffer).getAll(buffer).table1(name, buffer).addCommitPullPush(branch, name, buffer);
+			checkout(branch, buffer).getAll(buffer);
+			Arrays.stream(name.split("#")).forEach(table->table1(table, buffer));
+			addCommitPullPush(branch, name, buffer);
 		} catch (Exception e) {
 
 		}
