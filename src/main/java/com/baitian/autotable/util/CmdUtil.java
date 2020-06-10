@@ -10,24 +10,25 @@ import java.io.File;
 public class CmdUtil {
 	public static boolean executeCommand(String command) {
 		try {
-			Runtime.getRuntime().exec(command);
+			Process p = Runtime.getRuntime().exec(command);
+			p.waitFor();
+			return p.exitValue() == 0;
 		} catch (Exception e) {
 			System.out.println("execute command error. command:" + command);
 			System.out.println("exception:" + e);
 			return false;
 		}
-		return true;
 	}
 
 	public static boolean executeCommand(String command, String dirLocation) {
 		try {
 			Process p = Runtime.getRuntime().exec(command, null, new File(dirLocation));
-			System.out.println();
+			p.waitFor();
+			return p.exitValue() == 0;
 		} catch (Exception e) {
 			System.out.println("execute command error. command:" + command);
 			System.out.println("exception:" + e);
 			return false;
 		}
-		return true;
 	}
 }

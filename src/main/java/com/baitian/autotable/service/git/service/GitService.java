@@ -1,4 +1,4 @@
-package com.baitian.autotable.service.git;
+package com.baitian.autotable.service.git.service;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
@@ -74,7 +74,7 @@ public class GitService {
 			repo = new FileRepository(repoGitDir.getAbsolutePath());
 			Git git = new Git(repo);
 			Status status = git.status().call();
-			return !status.getChanged().isEmpty();
+			return status.hasUncommittedChanges();
 		} catch (Exception e) {
 			LOGGER.info(e.getMessage());
 		} finally {

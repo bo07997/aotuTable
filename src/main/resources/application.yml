@@ -1,12 +1,37 @@
 server:
   port: 8080
-
-logging:                                # 配置日志级别，让hibernate打印出执行的SQL
+spring:
+    application:
+        name: microservice-autotable
+    http:
+        encoding:
+            charset:UTF-8
+            enabled:true
+            force:true
+        messages:
+            encoding:UTF-8
+    mail:
+        host: smtp.exmail.qq.com
+        username: aox@aobi.com
+        password: AoQi000
+        default-encoding: utf-8
+        properties:
+          mail:
+            smtp:
+              auth: true
+              starttls:
+                enable: true
+                required: true
+logging:
   level:
-    root: INFO
-    org.hibernate: INFO
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.hibernate.type.descriptor.sql.BasicExtractor: TRACE
+    org.springframework.web: ERROR
+    com.yiibai: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file: mylog.log
+
+
 
 
 
