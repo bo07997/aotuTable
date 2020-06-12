@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author ldb
@@ -45,12 +44,11 @@ public class ClientService {
 	public Message getXML(Message message) {
 		message.putResult(CodeConfig.SUCCESS);
 		message.putValue("tables", commonService.selectAll());
-		return message;
-	}
-
-	public Message getRecord(Message message) {
-		message.putValue("record", TIME_RECORD.entrySet().stream()
-				.collect(Collectors.toMap(Map.Entry::getKey, en -> en.getValue().getMessage())));
+		TreeMap<Long, Object> kvTreeMap = new TreeMap<>();
+		for (Map.Entry<Long, Message> longMessageEntry : TIME_RECORD.entrySet()) {
+			kvTreeMap.put(longMessageEntry.getKey(), longMessageEntry.getValue().getMessage());
+		}
+		message.putValue("record", kvTreeMap);
 		return message;
 	}
 
