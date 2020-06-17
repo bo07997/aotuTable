@@ -85,9 +85,10 @@ public class WebSocketServer {
 	 */
 	public static void sendTo(Message message) {
 		Session s = clients.get(message.getSessionId());
+		String result = GsonUtil.toJson(message);
 		if (s != null) {
 			try {
-				s.getBasicRemote().sendText(message.toString());
+				s.getBasicRemote().sendText(result);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -13,7 +13,7 @@ public class TestTF {
 		//				"ping localhost",
 		//				"C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\Common7\\IDE");
 		boolean testt = CmdUtil.executeCommand(
-				"C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\Common7\\IDE\\TF.exe get E:\\vstsworkspace\\projectX美术产品\\产品\\项目管理\\每周修改表");
+				"C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\Common7\\IDE\\TF.exe get E:\\vstsworkspace\\projectX美术产品\\产品\\项目管理\\每周修改表\\pet");
 		System.out.println();
 	}
 }

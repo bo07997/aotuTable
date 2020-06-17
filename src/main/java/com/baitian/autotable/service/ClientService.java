@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -66,13 +65,13 @@ public class ClientService {
 			}
 
 			if (Arrays.stream(tables.split(",")).map(table -> table1(table, message)).allMatch(Objects::isNull)) {
-				message.putResult(CodeConfig.SUCCESS);
+				message.putResult(CodeConfig.ERROR);
 				return message;
 			}
 			long ts = System.currentTimeMillis();
 			checkChange(message).addCommitPullPush(branch, tables, message);
 			mailService.send("【导表人】  " + name + "<br/>" + "【表名】  " + tables + "<br/>【分支】 " + branch + "<br/>" + "【时间】 "
-					+ FORMAT.format(LocalDate.now())
+					+ FORMAT.format(new Date())
 					+ "<br/>【结果】 成功");
 
 			TIME_RECORD.put(ts, message);
@@ -80,7 +79,7 @@ public class ClientService {
 				TIME_RECORD.pollFirstEntry();
 			}
 		} catch (Exception e) {
-			message.putResult(e.getMessage());
+			message.putResult(CodeConfig.ERROR);
 			return message;
 		}
 		message.putResult(CodeConfig.END);

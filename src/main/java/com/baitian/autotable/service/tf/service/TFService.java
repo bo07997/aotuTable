@@ -21,8 +21,8 @@ public class TFService {
 	}
 
 	private String getCommand(String location) {
-		//		return "tf";
-		return exeLocation + " get " + location;
+		//递归获取
+		return exeLocation + " get /recursive " + location;
 	}
 
 }
