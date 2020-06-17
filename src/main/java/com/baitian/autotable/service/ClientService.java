@@ -11,6 +11,9 @@ import com.baitian.autotable.webscoket.sendone.WebSocketServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -34,7 +37,7 @@ public class ClientService {
 	@Autowired
 	private MailService mailService;
 	private static final TreeMap<Long, Message> TIME_RECORD = new TreeMap<>();
-
+	private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	/**
 	 * 请求这个接口默认关注
 	 *
@@ -57,16 +60,21 @@ public class ClientService {
 			String branch = message.getMessage().get("branch").toString();
 			String tables = message.getMessage().get("tables").toString();
 			String name = message.getMessage().get("name").toString();
-			checkout(branch, message).getAll(message);
+			if (checkout(branch, message).getAll(message) == null) {
+				message.putResult(CodeConfig.ERROR);
+				return message;
+			}
+
 			if (Arrays.stream(tables.split(",")).map(table -> table1(table, message)).allMatch(Objects::isNull)) {
 				message.putResult(CodeConfig.SUCCESS);
 				return message;
 			}
 			long ts = System.currentTimeMillis();
 			checkChange(message).addCommitPullPush(branch, tables, message);
-			mailService.send("【导表人】  " + name + "<br/>" + "【表名】  " + tables + "<br/>【分支】 " + branch + "<br/>" + "【时间戳】 "
-					+ ts
+			mailService.send("【导表人】  " + name + "<br/>" + "【表名】  " + tables + "<br/>【分支】 " + branch + "<br/>" + "【时间】 "
+					+ FORMAT.format(LocalDate.now())
 					+ "<br/>【结果】 成功");
+
 			TIME_RECORD.put(ts, message);
 			if (TIME_RECORD.size() > MAP_MAX_SIZE) {
 				TIME_RECORD.pollFirstEntry();
@@ -90,9 +98,9 @@ public class ClientService {
 	//	}
 
 	ClientService checkout(String branch, Message message) {
-		setMessageAndPush("尝试切换分支..." ,message);
-		Boolean result = gitService.checkout(branch);
-		setMessageAndPush("结果:" + result ,message);
+		setMessageAndPushAll("尝试切换分支...", message);
+		boolean result = gitService.checkout(branch);
+		setMessageAndPushAll("结果:" + result, message);
 		if (!result) {
 			return null;
 		}
@@ -100,9 +108,9 @@ public class ClientService {
 	}
 
 	ClientService getAll(Message message) {
-		setMessageAndPush("开始拉取文件..." ,message);
-		Boolean result = tfService.getAll();
-		setMessageAndPush("结果:" + result ,message);
+		setMessageAndPushAll("开始拉取文件...", message);
+		boolean result = tfService.getAll();
+		setMessageAndPushAll("结果:" + result, message);
 		if (!result) {
 			return null;
 		}
@@ -110,9 +118,9 @@ public class ClientService {
 	}
 
 	ClientService table1(String tableName, Message message) {
-		setMessageAndPush("开始导表..." ,message);
-		Boolean result = tableService.table1(Collections.singletonList(tableName));
-		setMessageAndPush("结果:" + result ,message);
+		setMessageAndPushAll("开始导表...", message);
+		boolean result = tableService.table1(Collections.singletonList(tableName));
+		setMessageAndPushAll("结果:" + result, message);
 		if (!result) {
 			return null;
 		}
@@ -121,7 +129,7 @@ public class ClientService {
 
 	ClientService checkChange(Message message) {
 		if (!gitService.hasChange()) {
-			setMessageAndPush("没有变化...",message);
+			setMessageAndPushAll("没有变化...", message);
 			return null;
 		}
 		return this;
@@ -141,20 +149,29 @@ public class ClientService {
 	//	}
 
 	ClientService addCommitPullPush(String branch, String tableName, Message message) {
-		setMessageAndPush("开始提交新增...",message);
-		Boolean result = gitService.addCommitPullPush(branch, tableName);
-		setMessageAndPush("结果:" + result,message);
+		setMessageAndPushAll("开始提交新增...", message);
+		boolean result = gitService.addCommitPullPush(branch, tableName);
+		setMessageAndPushAll("结果:" + result, message);
 		if (!result) {
 			return null;
 		}
 		return this;
 	}
 
-	void setMessageAndPush(String str, Message message) {
+	void setMessageAndPushAll(String str, Message message) {
 		synchronized (message.getSessionId()) {
 			message.putResult(CodeConfig.SUCCESS);
 			message.putValue("msg", str);
 			WebSocketServer.sendAll(message);
+			message.getMessage().remove("msg");
+		}
+	}
+
+	void setMessageAndPush(String str, Message message) {
+		synchronized (message.getSessionId()) {
+			message.putResult(CodeConfig.SUCCESS);
+			message.putValue("msg", str);
+			WebSocketServer.sendTo(message);
 			message.getMessage().remove("msg");
 		}
 	}

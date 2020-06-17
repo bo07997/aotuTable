@@ -63,7 +63,7 @@ public class WebSocketServer {
 			} catch (NoSuchMethodException e) {
 				e.printStackTrace();
 				messageObject.putResult("no such method!");
-				sendAll(messageObject);
+				sendTo(messageObject);
 			}
 			try {
 				result = (Message) method.invoke(service, messageObject);
@@ -71,10 +71,10 @@ public class WebSocketServer {
 				e.printStackTrace();
 			}
 			assert result != null;
-			sendAll(result);
+			sendTo(result);
 		} catch (Exception e) {
 			messageObject.putResult(e.getMessage());
-			sendAll(messageObject);
+			sendTo(messageObject);
 		}
 	}
 

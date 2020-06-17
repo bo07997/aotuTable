@@ -21,7 +21,8 @@ public class TFService {
 	}
 
 	private String getCommand(String location) {
-		return exeLocation + "  " + "get" + "  " + location;
+		//		return "tf";
+		return exeLocation + " get " + location;
 	}
 
 }

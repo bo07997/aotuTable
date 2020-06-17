@@ -22,7 +22,8 @@ public class CmdUtil {
 
 	public static boolean executeCommand(String command, String dirLocation) {
 		try {
-			Process p = Runtime.getRuntime().exec(command, null, new File(dirLocation));
+			File test = new File(dirLocation);
+			Process p = Runtime.getRuntime().exec(command, null, test);
 			p.waitFor();
 			return p.exitValue() == 0;
 		} catch (Exception e) {
