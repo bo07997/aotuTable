@@ -19,15 +19,13 @@ public class MailService {
 	@Autowired
 	private JavaMailSenderImpl mailSender;
 
-	public void send(String content) throws MessagingException {
+	public void send(String content, String mail) throws MessagingException {
 		MimeMessage message = mailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message, true);
 		helper.setFrom("aox@aobi.com");
 		// 收件人邮箱
-		helper.setTo(new String[] { "projectxdev@aobi.com", "projectxtest@aobi.com" });
-		//		helper.setTo("liudianbo@aobi.com");
-		// 标题
-		helper.setSubject("自动导表通知邮件");
+		helper.setTo(new String[] { "projectxtest@aobi.com", mail });
+		helper.setSubject("自动导表通知邮件(收到这封邮件麻烦相应测试刮风)");
 		// 正文
 		helper.setText(content, true);
 		// 发送

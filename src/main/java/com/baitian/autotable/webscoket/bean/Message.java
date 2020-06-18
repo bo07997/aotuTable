@@ -1,11 +1,11 @@
-package com.baitian.autotable.webscoket.sendone;
+package com.baitian.autotable.webscoket.bean;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
+import java.util.Arrays;
 
 @Data
 @Builder
@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class Message {
 	private String sessionId;
-	private Map<String, Object> message;
+	private MessageMap<String, Object> message;
 	private String service;
 	private String method;
 
@@ -44,11 +44,11 @@ public class Message {
 		this.method = method;
 	}
 
-	public Map<String, Object> getMessage() {
+	public MessageMap<String, Object> getMessage() {
 		return message;
 	}
 
-	public void setMessage(Map<String, Object> message) {
+	public void setMessage(MessageMap<String, Object> message) {
 		this.message = message;
 	}
 
@@ -56,7 +56,19 @@ public class Message {
 		this.message.put("r", result);
 	}
 
+	public void putMsg(String msg) {
+		this.message.put("msg", msg);
+	}
+
+	public void clearMsg() {
+		this.message.remove("msg");
+	}
+
 	public void putValue(String key, Object result) {
 		this.message.put(key, result);
+	}
+
+	public boolean assertParams(String... keys) {
+		return Arrays.stream(keys).allMatch(key -> this.message.containsKey(key));
 	}
 }

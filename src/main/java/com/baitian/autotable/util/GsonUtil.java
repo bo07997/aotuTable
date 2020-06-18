@@ -1,6 +1,6 @@
 package com.baitian.autotable.util;
 
-import com.baitian.autotable.webscoket.sendone.Message;
+import com.baitian.autotable.webscoket.bean.Message;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;

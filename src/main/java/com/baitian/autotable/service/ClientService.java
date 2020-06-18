@@ -6,14 +6,19 @@ import com.baitian.autotable.service.git.service.GitService;
 import com.baitian.autotable.service.mail.service.MailService;
 import com.baitian.autotable.service.table.service.TableService;
 import com.baitian.autotable.service.tf.service.TFService;
-import com.baitian.autotable.webscoket.sendone.Message;
-import com.baitian.autotable.webscoket.sendone.WebSocketServer;
+import com.baitian.autotable.util.exception.AutoTableInterruptException;
+import com.baitian.autotable.webscoket.bean.Message;
+import com.baitian.autotable.webscoket.server.WebSocketServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author ldb
@@ -35,13 +40,27 @@ public class ClientService {
 	private CommonService commonService;
 	@Autowired
 	private MailService mailService;
+
 	private static final TreeMap<Long, Message> TIME_RECORD = new TreeMap<>();
 	private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private static final ArrayBlockingQueue<Message> FAIR_QUEUE = new ArrayBlockingQueue<>(10, true);
+	private static final ExecutorService SINGLE_POOL = Executors.newSingleThreadExecutor();
+
+	{
+		SINGLE_POOL.execute(() -> {
+			while (true) {
+				try {
+					WebSocketServer.sendAll(autoTableConsumption(FAIR_QUEUE.take()));
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
 	/**
-	 * 请求这个接口默认关注
-	 *
-	 * @param message
-	 * @return
+	 * @param message message
+	 * @return Message
 	 */
 	public Message getXML(Message message) {
 		message.putResult(CodeConfig.SUCCESS);
@@ -54,26 +73,43 @@ public class ClientService {
 		return message;
 	}
 
-	public synchronized Message autoTable(Message message) {
+	public Message autoTable(Message message) {
 		try {
-			String branch = message.getMessage().get("branch").toString();
-			String tables = message.getMessage().get("tables").toString();
-			String name = message.getMessage().get("name").toString();
-			if (checkout(branch, message).getAll(message) == null) {
-				message.putResult(CodeConfig.ERROR);
-				return message;
-			}
+			FAIR_QUEUE.offer(message, 10, TimeUnit.SECONDS);
+			message.putResult(CodeConfig.SUCCESS);
+			message.putMsg(String.format("放入任务队列成功,当前待完成任务数目:%d", FAIR_QUEUE.size()));
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			message.putResult(CodeConfig.ERROR);
+			message.putMsg("放入任务队列超时(队列已满)");
+		}
+		return message;
+	}
 
-			if (Arrays.stream(tables.split(",")).map(table -> table1(table, message)).allMatch(Objects::isNull)) {
-				message.putResult(CodeConfig.ERROR);
+	private synchronized Message autoTableConsumption(Message message) {
+		try {
+			if (!message.assertParams("branch", "tables", "name", "mail", "windy")) {
+				message.clearMsg();
+				message.putResult(CodeConfig.PARAM_ERROR);
 				return message;
 			}
+			String branch = message.getMessage().getString("branch");
+			String tables = message.getMessage().getString("tables");
+			String name = message.getMessage().getString("name");
+			String mail = message.getMessage().getString("mail");
+			boolean windy = message.getMessage().getBool("windy");
+			checkout(branch, message);
+			getAll(message);
+			Arrays.stream(tables.split(",")).forEach(table -> table1(table, message));
 			long ts = System.currentTimeMillis();
-			checkChange(message).addCommitPullPush(branch, tables, message);
-			mailService.send("【导表人】  " + name + "<br/>" + "【表名】  " + tables + "<br/>【分支】 " + branch + "<br/>" + "【时间】 "
-					+ FORMAT.format(new Date())
-					+ "<br/>【结果】 成功");
-
+			checkChange(message);
+			addCommitPullPush(branch, tables, message);
+			if (windy) {
+				mailService
+						.send("【导表人】  " + name + "<br/>" + "【表名】  " + tables + "<br/>【分支】 " + branch + "<br/>" + "【时间】 "
+								+ FORMAT.format(new Date())
+								+ "<br/>【结果】 成功", mail);
+			}
 			TIME_RECORD.put(ts, message);
 			if (TIME_RECORD.size() > MAP_MAX_SIZE) {
 				TIME_RECORD.pollFirstEntry();
@@ -86,92 +122,64 @@ public class ClientService {
 		return message;
 	}
 
-	//	public String autoTable2(String branch, String name) {
-	//		StringBuilder buffer = new StringBuilder();
-	//		try {
-	//			checkout(branch, buffer, message).getAll(buffer).table2(name, buffer).addCommitPullPush(branch, name, buffer);
-	//		} catch (Exception e) {
-	//
-	//		}
-	//		return buffer.toString();
-	//	}
-
-	ClientService checkout(String branch, Message message) {
+	void checkout(String branch, Message message) {
 		setMessageAndPushAll("尝试切换分支...", message);
 		boolean result = gitService.checkout(branch);
 		setMessageAndPushAll("结果:" + result, message);
 		if (!result) {
-			return null;
+			throw new AutoTableInterruptException();
 		}
-		return this;
 	}
 
-	ClientService getAll(Message message) {
+	void getAll(Message message) {
 		setMessageAndPushAll("开始拉取文件...", message);
 		boolean result = tfService.getAll();
 		setMessageAndPushAll("结果:" + result, message);
 		if (!result) {
-			return null;
+			throw new AutoTableInterruptException();
 		}
-		return this;
 	}
 
-	ClientService table1(String tableName, Message message) {
+	void table1(String tableName, Message message) {
 		setMessageAndPushAll("开始导表...", message);
 		boolean result = tableService.table1(Collections.singletonList(tableName));
 		setMessageAndPushAll("结果:" + result, message);
 		if (!result) {
-			return null;
+			throw new AutoTableInterruptException();
 		}
-		return this;
 	}
 
-	ClientService checkChange(Message message) {
+	void checkChange(Message message) {
 		if (!gitService.hasChange()) {
 			setMessageAndPushAll("没有变化...", message);
-			return null;
+			throw new AutoTableInterruptException();
 		}
-		return this;
 	}
-	//	ClientService table2(String tableName, Message message) {
-	//		buffer.append("开始导表...").append("<br />");
-	//		Boolean result = tableService.table2(tableName);
-	//		buffer.append("结果:").append(result).append("<br />");
-	//		if (!result) {
-	//			return null;
-	//		}
-	//		if (!gitService.hasChange()){
-	//			buffer.append("没有变化").append("<br />");
-	//			return null;
-	//		}
-	//		return this;
-	//	}
 
-	ClientService addCommitPullPush(String branch, String tableName, Message message) {
+	void addCommitPullPush(String branch, String tableName, Message message) {
 		setMessageAndPushAll("开始提交新增...", message);
 		boolean result = gitService.addCommitPullPush(branch, tableName);
 		setMessageAndPushAll("结果:" + result, message);
 		if (!result) {
-			return null;
+			throw new AutoTableInterruptException();
 		}
-		return this;
 	}
 
 	void setMessageAndPushAll(String str, Message message) {
 		synchronized (message.getSessionId()) {
 			message.putResult(CodeConfig.SUCCESS);
-			message.putValue("msg", str);
+			message.putMsg(str);
 			WebSocketServer.sendAll(message);
-			message.getMessage().remove("msg");
+			message.clearMsg();
 		}
 	}
 
 	void setMessageAndPush(String str, Message message) {
 		synchronized (message.getSessionId()) {
 			message.putResult(CodeConfig.SUCCESS);
-			message.putValue("msg", str);
+			message.putMsg(str);
 			WebSocketServer.sendTo(message);
-			message.getMessage().remove("msg");
+			message.clearMsg();
 		}
 	}
 }

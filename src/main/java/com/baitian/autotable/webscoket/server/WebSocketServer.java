@@ -1,7 +1,8 @@
-package com.baitian.autotable.webscoket.sendone;
+package com.baitian.autotable.webscoket.server;
 
 import com.baitian.autotable.util.BeanUtils;
 import com.baitian.autotable.util.GsonUtil;
+import com.baitian.autotable.webscoket.bean.Message;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -25,7 +26,7 @@ public class WebSocketServer {
 	 * 用于存放所有在线客户端
 	 */
 	private static Map<String, Session> clients = new ConcurrentHashMap<>();
-	private static final ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+	private static final ExecutorService CACHED_THREAD_POOL = Executors.newCachedThreadPool();
 	private Gson gson = new Gson();
 
 	@OnOpen
@@ -101,16 +102,10 @@ public class WebSocketServer {
 	 *
 	 * @param message 消息内容
 	 */
-	//	public synchronized static void sendAll(Message message) throws IOException {
-	//		String result = message.toString();
-	//		for (Map.Entry<String, Session> sessionEntry : clients.entrySet()) {
-	//			sessionEntry.getValue().getBasicRemote().sendText(result);
-	//		}
-	//	}
 	public static void sendAll(Message message) {
 		String result = GsonUtil.toJson(message);
 		for (Map.Entry<String, Session> sessionEntry : clients.entrySet()) {
-			cachedThreadPool.execute(() -> {
+			CACHED_THREAD_POOL.execute(() -> {
 				synchronized (sessionEntry.getValue()) {
 					try {
 						sessionEntry.getValue().getBasicRemote().sendText(result);

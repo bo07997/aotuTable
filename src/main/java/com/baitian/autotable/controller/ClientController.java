@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 放弃
+ */
 @RestController
 public class ClientController {
 	@Autowired
