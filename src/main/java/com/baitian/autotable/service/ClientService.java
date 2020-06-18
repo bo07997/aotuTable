@@ -90,7 +90,7 @@ public class ClientService {
 	private synchronized Message autoTableConsumption(Message message) {
 		try {
 			if (!message.assertParams("branch", "tables", "name", "mail", "windy")) {
-				message.clearMsg();
+				message.putMsg("参数错误");
 				message.putResult(CodeConfig.PARAM_ERROR);
 				return message;
 			}
@@ -117,6 +117,7 @@ public class ClientService {
 			}
 		} catch (Exception e) {
 			message.putResult(CodeConfig.ERROR);
+			message.putMsg(e.getMessage());
 			return message;
 		}
 		message.putResult(CodeConfig.END);
