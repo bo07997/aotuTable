@@ -2,6 +2,7 @@ package com.baitian.autotable.service.git.service;
 
 import com.baitian.autotable.service.ClientService;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
@@ -34,7 +35,6 @@ public class GitService {
 			repo = new FileRepository(repoGitDir.getAbsolutePath());
 			Git git = new Git(repo);
 			add(git, info).commit(git, info).pull(git).push(git);
-			//			add(git).commit(git, info).pull(git);
 		} catch (Exception e) {
 			LOGGER.info(e.getMessage());
 			return false;
@@ -68,6 +68,7 @@ public class GitService {
 			}
 		}
 	}
+
 	public boolean hasChange(){
 		File repoGitDir = new File(gitLocation);
 		Repository repo = null;
@@ -85,8 +86,9 @@ public class GitService {
 		}
 		return false;
 	}
+
 	/**
-	 * 外部切换分支
+	 * 外部切换分支,并且尝试重置
 	 */
 	public boolean checkout(String branchName) {
 		File repoGitDir = new File(gitLocation);
@@ -94,6 +96,11 @@ public class GitService {
 		try {
 			repo = new FileRepository(repoGitDir.getAbsolutePath());
 			Git git = new Git(repo);
+			if (hasChange(git)) {
+				git.reset().setMode(ResetCommand.ResetType.HARD)
+						.setRef(git.fetch().getRemote() + "/" + repo.getBranch())
+						.call();
+			}
 			git.checkout().setCreateBranch(false).setName(branchName).call();
 		} catch (Exception e) {
 			LOGGER.info(e.getMessage());
@@ -104,6 +111,14 @@ public class GitService {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * 变化
+	 */
+	public boolean hasChange(Git git) throws GitAPIException {
+		Status status = git.status().call();
+		return status.hasUncommittedChanges();
 	}
 
 	/**
@@ -147,4 +162,5 @@ public class GitService {
 		git.push().call();
 		return this;
 	}
+
 }
