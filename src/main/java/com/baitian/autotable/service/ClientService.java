@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 public class ClientService {
 
 	public static final int MAP_MAX_SIZE = 10;
+	public static final String REGEX = ",";
 	@Autowired
 	private TableService tableService;
 	@Autowired
@@ -100,7 +101,7 @@ public class ClientService {
 			boolean windy = message.getMessage().getBool("windy");
 			checkout(branch, message);
 			getAll(message);
-			Arrays.stream(tables.split(",")).forEach(table -> table1(table, message));
+			Arrays.stream(tables.split(REGEX)).forEach(table -> table1(table, message));
 			long ts = System.currentTimeMillis();
 			checkChange(message);
 			addCommitPullPush(branch, tables, message);

@@ -1,5 +1,6 @@
 package com.baitian.autotable.service.git.service;
 
+import com.baitian.autotable.service.ClientService;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -32,7 +33,7 @@ public class GitService {
 		try {
 			repo = new FileRepository(repoGitDir.getAbsolutePath());
 			Git git = new Git(repo);
-			add(git).commit(git, info).pull(git).push(git);
+			add(git, info).commit(git, info).pull(git).push(git);
 			//			add(git).commit(git, info).pull(git);
 		} catch (Exception e) {
 			LOGGER.info(e.getMessage());
@@ -114,10 +115,12 @@ public class GitService {
 	}
 
 	/**
-	 * 添加到工作区,这里有bug用jGit,老是提交一些奇怪的修改
+	 * 添加到工作区,这里有bug用jGit,老是提交一些奇怪的修改,所以限制严格点
 	 */
-	public GitService add(Git git) throws GitAPIException {
-		git.add().addFilepattern(workLocation).call();
+	public GitService add(Git git, String info) throws GitAPIException {
+		for (String table : info.split(ClientService.REGEX)) {
+			git.add().addFilepattern(workLocation + table + "*").call();
+		}
 		return this;
 	}
 
