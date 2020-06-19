@@ -134,7 +134,7 @@ public class GitService {
 	 */
 	public GitService add(Git git, String info) throws GitAPIException {
 		for (String table : info.split(ClientService.REGEX)) {
-			git.add().addFilepattern(workLocation + table + "*").call();
+			git.add().addFilepattern(workLocation + table + ".xml").call();
 		}
 		return this;
 	}

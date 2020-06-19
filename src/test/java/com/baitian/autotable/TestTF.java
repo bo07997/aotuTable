@@ -2,9 +2,7 @@ package com.baitian.autotable;
 
 import com.baitian.autotable.service.git.service.GitService;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
-import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,11 +37,12 @@ public class TestTF {
 		Repository repo = null;
 		try {
 			repo = new FileRepository(repoGitDir.getAbsolutePath());
-			String test = repo.getBranch();
 			Git git = new Git(repo);
-
-			Ref ref = git.reset().setMode(ResetCommand.ResetType.HARD).call();
-			git.reset().setMode(ResetCommand.ResetType.HARD).setRef(ref.getName());
+			//			Ref ref = git.reset().setMode(ResetCommand.ResetType.HARD).call();
+			//			git.reset().setMode(ResetCommand.ResetType.HARD).setRef(ref.getName());
+			git.add().addFilepattern("source/server/config/commonEvolve.xml").call();
+			//			git.commit().setMessage("test").call();
+			git.push().call();
 		} catch (Exception e) {
 		} finally {
 			if (repo != null) {
