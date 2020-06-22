@@ -4,6 +4,7 @@ import com.baitian.autotable.service.git.service.GitService;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.transport.PushResult;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -42,7 +43,9 @@ public class TestTF {
 			//			git.reset().setMode(ResetCommand.ResetType.HARD).setRef(ref.getName());
 			git.add().addFilepattern("source/server/config/commonEvolve.xml").call();
 			//			git.commit().setMessage("test").call();
-			git.push().call();
+			//			git.commit().setMessage("test").call();
+			Iterable<PushResult> test = git.push().call();
+			System.out.println();
 		} catch (Exception e) {
 		} finally {
 			if (repo != null) {

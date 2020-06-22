@@ -4,9 +4,11 @@ import com.baitian.autotable.service.ClientService;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.Status;
+import org.eclipse.jgit.api.errors.EmptyCommitException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.transport.PushResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -101,6 +103,7 @@ public class GitService {
 						.setRef(git.fetch().getRemote() + "/" + repo.getBranch())
 						.call();
 			}
+			pull(git);
 			git.checkout().setCreateBranch(false).setName(branchName).call();
 		} catch (Exception e) {
 			LOGGER.info(e.getMessage());
@@ -159,7 +162,13 @@ public class GitService {
 	 * 推到远程
 	 */
 	public GitService push(Git git) throws GitAPIException {
-		git.push().call();
+		Iterable<PushResult> results = git.push().call();
+		while (results.iterator().hasNext()) {
+			if (!results.iterator().next().getRemoteUpdates().stream()
+					.allMatch(update -> update.getStatus().ordinal() == 1)) {
+				throw new EmptyCommitException("提交失败,请重新导表");
+			}
+		}
 		return this;
 	}
 
