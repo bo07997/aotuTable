@@ -2,13 +2,14 @@ package com.baitian.autotable;
 
 import com.baitian.autotable.service.git.service.GitService;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.transport.PushResult;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
+import java.util.Set;
 
 /**
  * @author ldb
@@ -44,7 +45,9 @@ public class TestTF {
 			git.add().addFilepattern("source/server/config/commonEvolve.xml").call();
 			//			git.commit().setMessage("test").call();
 			//			git.commit().setMessage("test").call();
-			Iterable<PushResult> test = git.push().call();
+			Status status = git.status().call();
+			Set<String> test = status.getUncommittedChanges();
+			//			Iterable<PushResult> test = git.push().call();
 			System.out.println();
 		} catch (Exception e) {
 		} finally {

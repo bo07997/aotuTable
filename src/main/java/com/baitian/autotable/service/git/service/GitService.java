@@ -1,6 +1,5 @@
 package com.baitian.autotable.service.git.service;
 
-import com.baitian.autotable.service.ClientService;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.Status;
@@ -136,8 +135,10 @@ public class GitService {
 	 * 添加到工作区,这里有bug用jGit,老是提交一些奇怪的修改,所以限制严格点
 	 */
 	public GitService add(Git git, String info) throws GitAPIException {
-		for (String table : info.split(ClientService.REGEX)) {
-			git.add().addFilepattern(workLocation + table + ".xml").call();
+		Status status = git.status().call();
+		String[] changes = status.getUncommittedChanges().toArray(new String[0]);
+		for (String change : changes) {
+			git.add().addFilepattern(change).call();
 		}
 		return this;
 	}
