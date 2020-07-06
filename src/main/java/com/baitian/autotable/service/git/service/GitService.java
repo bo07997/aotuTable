@@ -1,5 +1,6 @@
 package com.baitian.autotable.service.git.service;
 
+import com.baitian.autotable.webscoket.bean.Message;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.Status;
@@ -91,7 +92,7 @@ public class GitService {
 	/**
 	 * 外部切换分支,并且尝试重置
 	 */
-	public boolean checkout(String branchName) {
+	public boolean checkout(String branchName, Message message) {
 		File repoGitDir = new File(gitLocation);
 		Repository repo = null;
 		try {
@@ -108,6 +109,7 @@ public class GitService {
 			pull(git);
 		} catch (Exception e) {
 			LOGGER.info(e.getMessage());
+			message.setLog(e.getMessage());
 			return false;
 		} finally {
 			if (repo != null) {

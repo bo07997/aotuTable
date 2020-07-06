@@ -126,7 +126,7 @@ public class ClientService {
 
 	void checkout(String branch, Message message) {
 		setMessageAndPushAll("尝试切换分支...", message);
-		boolean result = gitService.checkout(branch);
+		boolean result = gitService.checkout(branch, message);
 		setMessageAndPushAll("结果:" + result, message);
 		if (!result) {
 			throw new AutoTableInterruptException();

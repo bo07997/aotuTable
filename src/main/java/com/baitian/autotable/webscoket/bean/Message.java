@@ -19,7 +19,7 @@ public class Message {
 	private MessageMap<String, Object> message;
 	private String service;
 	private String method;
-
+	private String log;
 	public String getSessionId() {
 		return sessionId;
 	}
@@ -42,6 +42,14 @@ public class Message {
 
 	public void setMethod(String method) {
 		this.method = method;
+	}
+
+	public String getLog() {
+		return log;
+	}
+
+	public void setLog(String log) {
+		this.log = log;
 	}
 
 	public MessageMap<String, Object> getMessage() {
