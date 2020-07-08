@@ -9,6 +9,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.transport.PushResult;
+import org.eclipse.jgit.transport.RemoteRefUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -170,7 +171,8 @@ public class GitService {
 		Iterable<PushResult> results = git.push().call();
 		while (results.iterator().hasNext()) {
 			if (!results.iterator().next().getRemoteUpdates().stream()
-					.allMatch(update -> update.getStatus().ordinal() == 1)) {
+					.allMatch(update -> update.getStatus() == RemoteRefUpdate.Status.OK
+							|| update.getStatus() == RemoteRefUpdate.Status.NOT_ATTEMPTED)) {
 				throw new EmptyCommitException("提交失败,请重新导表");
 			}
 		}
