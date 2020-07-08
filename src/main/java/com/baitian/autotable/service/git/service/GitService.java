@@ -169,10 +169,9 @@ public class GitService {
 	 */
 	public GitService push(Git git) throws GitAPIException {
 		Iterable<PushResult> results = git.push().call();
-		while (results.iterator().hasNext()) {
-			if (!results.iterator().next().getRemoteUpdates().stream()
-					.allMatch(update -> update.getStatus() == RemoteRefUpdate.Status.OK
-							|| update.getStatus() == RemoteRefUpdate.Status.NOT_ATTEMPTED)) {
+		for (PushResult result : results) {
+			if (!result.getRemoteUpdates().stream()
+					.allMatch(update -> update.getStatus() == RemoteRefUpdate.Status.OK)) {
 				throw new EmptyCommitException("提交失败,请重新导表");
 			}
 		}
