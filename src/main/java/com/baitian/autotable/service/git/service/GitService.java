@@ -102,8 +102,10 @@ public class GitService {
 						.setRef(git.fetch().getRemote() + "/" + repo.getBranch())
 						.call();
 			}
+			if (!repo.getBranch().equals(branchName)) {
+				git.checkout().setCreateBranch(false).setName(branchName).call();
+			}
 			pull(git);
-			git.checkout().setCreateBranch(false).setName(branchName).call();
 		} catch (Exception e) {
 			LOGGER.info(e.getMessage());
 			return false;
