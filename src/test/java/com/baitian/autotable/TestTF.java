@@ -1,6 +1,8 @@
 package com.baitian.autotable;
 
 import com.baitian.autotable.service.git.service.GitService;
+import com.baitian.autotable.service.tf.service.TFService;
+import com.baitian.autotable.util.CmdUtil;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
@@ -17,21 +19,23 @@ import java.util.Set;
  * @date 2020/6/17 17:28
  */
 public class TestTF {
-	//	public static void main(String[] args) {
-	//		//		CmdUtil.executeCommand(
-	//		//				"ping localhost",
-	//		//				"C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\Common7\\IDE");
-	//		//		boolean testt = CmdUtil.executeCommand(
-	//		//				"C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\Common7\\IDE\\TF.exe get E:\\vstsworkspace\\projectX美术产品\\产品\\项目管理\\每周修改表\\pet");
-	//		System.out.println();
-	//	}
+	public static void main(String[] args) {
+		CmdUtil.executeCommand(
+				"tf get /recursive "
+						+ "E:\\vstsworkspace\\projectX\\source\\tools\\excelFactory");
+		System.out.println("ss");
+	}
 
 	@Autowired
 	private GitService gitService;
-
+	@Autowired
+	private TFService tfService;
 	@Test
 	public void testGit() {
-		System.out.println(hasChange());
+		CmdUtil.executeCommand(
+				"tf get /recursive "
+						+ "E:\\vstsworkspace\\projectX\\source\\tools\\excelFactory");
+		System.out.println("ss");
 	}
 
 	public boolean hasChange() {

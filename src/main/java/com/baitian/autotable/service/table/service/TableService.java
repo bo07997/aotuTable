@@ -58,9 +58,7 @@ public class TableService {
 
 	public String getJarCommand(List<String> locations) {
 		StringBuffer buffer = new StringBuffer("java -jar " + "  " + jarLocation + " -cmd ");
-		locations.forEach(str -> {
-			buffer.append("./").append(str).append(".xml ");
-		});
+		locations.forEach(str -> buffer.append("./").append(str).append(".xml "));
 		return buffer.toString();
 	}
 

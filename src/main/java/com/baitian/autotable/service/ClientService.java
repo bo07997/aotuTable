@@ -104,7 +104,7 @@ public class ClientService {
 			Arrays.stream(tables.split(REGEX)).forEach(table -> table1(table, message));
 			long ts = System.currentTimeMillis();
 			checkChange(message);
-			addCommitPullPush(branch, tables, message);
+			addCommitPullPush(branch, tables, message, name);
 			if (windy) {
 				mailService
 						.send("【导表人】  " + name + "<br/>" + "【表名】  " + tables + "<br/>【分支】 " + branch + "<br/>" + "【时间】 "
@@ -135,6 +135,7 @@ public class ClientService {
 
 	void getAll(Message message) {
 		setMessageAndPushAll("开始拉取文件...", message);
+		tfService.getAllTable();
 		boolean result = tfService.getAll();
 		setMessageAndPushAll("结果:" + result, message);
 		if (!result) {
@@ -158,9 +159,9 @@ public class ClientService {
 		}
 	}
 
-	void addCommitPullPush(String branch, String tableName, Message message) {
+	void addCommitPullPush(String branch, String tableName, Message message, String name) {
 		setMessageAndPushAll("开始提交新增...", message);
-		boolean result = gitService.addCommitPullPush(branch, tableName);
+		boolean result = gitService.addCommitPullPush(branch, tableName + "by " + name);
 		setMessageAndPushAll("结果:" + result, message);
 		if (!result) {
 			throw new AutoTableInterruptException();
