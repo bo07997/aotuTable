@@ -24,19 +24,27 @@ public class CommonService {
 	public String dirLocation;
 	@Autowired
 	private TableService tableService;
-
+	private static List<String> NAMES = null;
+	private static final int TIME = 120000;
+	private static long mills = 0;
 	/**
 	 * 查询脚本
 	 *
 	 * @return
 	 */
-	public List<String> selectAll() {
+	public synchronized List<String> selectAll() {
+		long now = System.currentTimeMillis();
+		if (now - mills < TIME) {
+			return NAMES;
+		}
+		mills = now;
 		String xmlTail = ".xml";
 		ArrayList<String> names = getFiles(dirLocation);
-		return names.stream()
+		NAMES = names.stream()
 				.filter(str -> xmlTail.equals(str.substring(str.length() - xmlTail.length())))
 				.map(str -> str.substring(0, str.length() - xmlTail.length()))
 				.sorted(Comparator.comparing(str -> -tableService.getCount(str))).collect(Collectors.toList());
+		return NAMES;
 	}
 
 	public static ArrayList<String> getFiles(String path) {
