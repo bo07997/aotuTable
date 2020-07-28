@@ -161,7 +161,7 @@ public class ClientService {
 
 	void addCommitPullPush(String branch, String tableName, Message message, String name) {
 		setMessageAndPushAll("开始提交新增...", message);
-		boolean result = gitService.addCommitPullPush(branch, tableName + "by " + name);
+		boolean result = gitService.addCommitPullPush(branch, tableName + " by " + name);
 		setMessageAndPushAll("结果:" + result, message);
 		if (!result) {
 			throw new AutoTableInterruptException();
