@@ -79,7 +79,7 @@ public class GitService {
 			repo = new FileRepository(repoGitDir.getAbsolutePath());
 			Git git = new Git(repo);
 			Status status = git.status().call();
-			return status.hasUncommittedChanges();
+			return !status.isClean();
 		} catch (Exception e) {
 			LOGGER.info(e.getMessage());
 		} finally {
