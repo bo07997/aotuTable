@@ -18,40 +18,25 @@ public class TableService {
 	public String jarLocation;
 	@Value("${com.baitian.autotable.dir.location}")
 	public String dirLocation;
-	private HashMap<String, Integer> name2Times = new HashMap<>();
+	private HashMap<Integer, Integer> name2Times = new HashMap<>();
 
 	/**
 	 * 通过locations运行通用脚本
 	 *
 	 * @param tables locations
+	 * @param id
 	 * @return boolean
 	 */
-	public boolean table1(List<String> tables) {
+	public boolean table1(List<String> tables, int id) {
 		String command = getJarCommand(tables);
-		tables.forEach(name -> {
-			if (!name2Times.containsKey(name)) {
-				name2Times.put(name, 0);
-			}
-			int times = name2Times.get(name);
-			name2Times.put(name, times + 1);
-		});
+		name2Times.putIfAbsent(id, 0);
+		name2Times.computeIfPresent(id, (k, v) -> v + 1);
 		return CmdUtil.executeCommand(command, dirLocation);
 	}
 
-	/**
-	 * 运行本地已打包脚本形式
-	 *
-	 * @param location location
-	 * @return boolean
-	 */
-	public boolean table2(String location) {
-		String command = getBatCommand(location);
-		return CmdUtil.executeCommand(command, dirLocation);
-	}
-
-	public int getCount(String name) {
-		if (name2Times.containsKey(name)) {
-			return name2Times.get(name);
+	public int getCount(int id) {
+		if (name2Times.containsKey(id)) {
+			return name2Times.get(id);
 		}
 		return 0;
 	}

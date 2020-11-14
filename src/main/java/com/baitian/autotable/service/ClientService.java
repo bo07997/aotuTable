@@ -3,11 +3,14 @@ package com.baitian.autotable.service;
 import com.baitian.autotable.config.CodeConfig;
 import com.baitian.autotable.db.dao.RelationRepository;
 import com.baitian.autotable.service.common.service.CommonService;
+import com.baitian.autotable.service.table.service.TableService;
 import com.baitian.autotable.webscoket.bean.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author ldb
@@ -26,16 +29,18 @@ public class ClientService {
 	private FrontEndService frontEndService;
 	@Autowired
 	private RelationRepository relationService;
-
+	@Autowired
+	private TableService tableService;
 	/**
 	 * @param message message
 	 * @return Message
 	 */
 	public Message getXML(Message message) {
 		message.putResult(CodeConfig.SUCCESS);
-		//		message.putValue("tables", commonService.selectAll());
 		message.putValue("record", backEndService.getRecord());
-		message.putValue("relation", relationService.findAll());
+		message.putValue("relation", relationService.findAll().stream()
+				.sorted(Comparator.comparing(rl -> -tableService.getCount(rl.getId()))).collect(
+						Collectors.toList()));
 		return message;
 	}
 

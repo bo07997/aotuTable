@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.util.HashMap;
+
 /**
  * @author ldb
  * @Package com.baitian.autotable
@@ -22,6 +24,11 @@ public class testDB {
 	@Test
 	public void testGit() {
 		//		Relation tt = relationRepository.findByBackEndTable("test");
-		String[] test = "".split("#");
+		HashMap<Integer, Integer> name2Times = new HashMap<>();
+		name2Times.putIfAbsent(1, 0);
+		name2Times.computeIfPresent(1, (k, v) -> v + 1);
+		name2Times.computeIfPresent(1, (k, v) -> v + 1);
+		name2Times.computeIfPresent(1, (k, v) -> v + 1);
+		name2Times.computeIfPresent(1, (k, v) -> v + 1);
 	}
 }
