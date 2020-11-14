@@ -66,4 +66,16 @@ public class TableService {
 		return location + ".bat";
 	}
 
+	/**
+	 * 前端使用
+	 */
+	/**
+	 * 通过locations运行通用脚本
+	 *
+	 * @param cmd cmd
+	 * @return boolean
+	 */
+	public boolean table3(String cmd, String location) {
+		return CmdUtil.executeCommand(cmd, location);
+	}
 }

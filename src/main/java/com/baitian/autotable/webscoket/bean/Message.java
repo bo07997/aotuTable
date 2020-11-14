@@ -16,10 +16,22 @@ import java.util.Arrays;
  */
 public class Message {
 	private String sessionId;
-	private MessageMap<String, Object> message;
+	private MessageMap<String, Object> message = new MessageMap<>();
 	private String service;
 	private String method;
+	private int TableType;
 	private String log;
+
+	public Message copyMessage() {
+		Message newMessage = new Message();
+		newMessage.setSessionId(sessionId);
+		newMessage.setService(service);
+		newMessage.setMethod(method);
+		newMessage.setLog(log);
+		message.forEach(newMessage::addMessage);
+		return newMessage;
+	}
+
 	public String getSessionId() {
 		return sessionId;
 	}
@@ -34,6 +46,14 @@ public class Message {
 
 	public void setService(String service) {
 		this.service = service;
+	}
+
+	public int getTableType() {
+		return TableType;
+	}
+
+	public void setTableType(int tableType) {
+		TableType = tableType;
 	}
 
 	public String getMethod() {
@@ -60,6 +80,10 @@ public class Message {
 		this.message = message;
 	}
 
+	public void addMessage(String key, Object value) {
+		this.message.put(key, value);
+	}
+
 	public void putResult(String result) {
 		this.message.put("r", result);
 	}
@@ -79,4 +103,5 @@ public class Message {
 	public boolean assertParams(String... keys) {
 		return Arrays.stream(keys).allMatch(key -> this.message.containsKey(key));
 	}
+
 }

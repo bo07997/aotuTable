@@ -25,13 +25,11 @@ import java.io.File;
 public class GitService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GitService.class);
 
-	@Value("${com.baitian.autotable.git.Location}")
-	public String gitLocation;
 
 	@Value("${com.baitian.autotable.git.workLocation}")
 	public String workLocation;
 
-	public boolean addCommitPullPush(String branchName, String info) {
+	public boolean addCommitPullPush(String info, String gitLocation) {
 		File repoGitDir = new File(gitLocation);
 		Repository repo = null;
 		try {
@@ -52,7 +50,7 @@ public class GitService {
 	/**
 	 * 状态
 	 */
-	public void status() {
+	public void status(String gitLocation) {
 		File repoGitDir = new File(gitLocation);
 		Repository repo = null;
 		try {
@@ -72,7 +70,7 @@ public class GitService {
 		}
 	}
 
-	public boolean hasChange(){
+	public boolean hasChange(String gitLocation) {
 		File repoGitDir = new File(gitLocation);
 		Repository repo = null;
 		try {
@@ -93,7 +91,7 @@ public class GitService {
 	/**
 	 * 外部切换分支,并且尝试重置
 	 */
-	public boolean checkout(String branchName, Message message) {
+	public boolean checkout(String branchName, Message message, String gitLocation) {
 		File repoGitDir = new File(gitLocation);
 		Repository repo = null;
 		try {

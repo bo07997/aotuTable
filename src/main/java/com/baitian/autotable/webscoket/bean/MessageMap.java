@@ -1,6 +1,9 @@
 package com.baitian.autotable.webscoket.bean;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author ldb
@@ -15,6 +18,10 @@ public class MessageMap<K, V> extends HashMap<K, V> {
 
 	public String getString(String key) {
 		return get(key).toString();
+	}
+
+	public List<Integer> getIntList(String key, String regex) {
+		return Arrays.stream(get(key).toString().split(regex)).map(Integer::parseInt).collect(Collectors.toList());
 	}
 
 	public boolean getBool(String key) {
