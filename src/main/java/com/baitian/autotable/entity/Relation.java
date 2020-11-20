@@ -1,9 +1,6 @@
 package com.baitian.autotable.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 
 /**
@@ -16,28 +13,29 @@ import java.io.Serializable;
 public class Relation implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(nullable = false)
 	private int id;
-	@Column(nullable = false)
+
 	private String backEndTable;
-	@Column(nullable = false)
+
 	private String frontEndTable;
-	@Column(nullable = false)
+
 	private String frontEndType;
 	private String frontEndParam;
-	private String desc;
+	private String description;
 
 	public Relation() {
 	}
 
 	public Relation(int id, String backEndTable, String frontEndTable, String frontEndType, String frontEndParam,
-			String desc) {
+			String description) {
 		this.id = id;
 		this.backEndTable = backEndTable;
 		this.frontEndTable = frontEndTable;
 		this.frontEndType = frontEndType;
 		this.frontEndParam = frontEndParam;
-		this.desc = desc;
+		this.description = description;
 	}
 
 	public int getId() {
@@ -80,11 +78,11 @@ public class Relation implements Serializable {
 		this.frontEndParam = frontEndParam;
 	}
 
-	public String getDesc() {
-		return desc;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setDesc(String desc) {
-		this.desc = desc;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }

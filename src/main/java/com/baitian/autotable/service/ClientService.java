@@ -2,7 +2,6 @@ package com.baitian.autotable.service;
 
 import com.baitian.autotable.config.CodeConfig;
 import com.baitian.autotable.db.dao.RelationRepository;
-import com.baitian.autotable.service.common.service.CommonService;
 import com.baitian.autotable.service.table.service.TableService;
 import com.baitian.autotable.webscoket.bean.Message;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +22,6 @@ public class ClientService {
 
 	@Autowired
 	private BackEndService backEndService;
-	@Autowired
-	private CommonService commonService;
 	@Autowired
 	private FrontEndService frontEndService;
 	@Autowired

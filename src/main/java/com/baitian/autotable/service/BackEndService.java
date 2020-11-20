@@ -3,11 +3,11 @@ package com.baitian.autotable.service;
 import com.baitian.autotable.config.CodeConfig;
 import com.baitian.autotable.db.dao.RelationRepository;
 import com.baitian.autotable.entity.Relation;
-import com.baitian.autotable.service.common.service.CommonService;
 import com.baitian.autotable.service.git.service.GitService;
 import com.baitian.autotable.service.mail.service.MailService;
 import com.baitian.autotable.service.table.service.TableService;
 import com.baitian.autotable.service.tf.service.TFService;
+import com.baitian.autotable.service.type.ProjectType;
 import com.baitian.autotable.service.type.TableType;
 import com.baitian.autotable.util.exception.AutoTableInterruptException;
 import com.baitian.autotable.webscoket.bean.Message;
@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 public class BackEndService {
 	public static final int MAP_MAX_SIZE = 10;
 	public static final String REGEX = ",";
+	public static final String REGEX_2 = "#";
 	@Value("${com.baitian.autotable.git.Location}")
 	public String gitLocation;
 	@Autowired
@@ -44,8 +45,6 @@ public class BackEndService {
 	private GitService gitService;
 	@Autowired
 	private MailService mailService;
-	@Autowired
-	private CommonService commonService;
 	@Autowired
 	private RelationRepository relationService;
 	private static final TreeMap<Long, Message> TIME_RECORD = new TreeMap<>();
@@ -68,7 +67,7 @@ public class BackEndService {
 	private synchronized Message autoTableConsumption(Message message) {
 		try {
 			message.setTableType(TableType.BACK_END.id);
-			if (!message.assertParams("branch", "tables", "name", "mail", "windy")) {
+			if (!message.assertParams("branch", "autoTableId", "name", "mail", "windy")) {
 				message.putMsg("参数错误");
 				message.putResult(CodeConfig.PARAM_ERROR);
 				return message;
@@ -93,7 +92,7 @@ public class BackEndService {
 			autoTableIdList.stream().map(back2Relation::get).forEach(rl -> table1(rl, message));
 			long ts = System.currentTimeMillis();
 			checkChange(message);
-			String tablesName = autoTableIdList.stream().map(back2Relation::get).map(Relation::getDesc)
+			String tablesName = autoTableIdList.stream().map(back2Relation::get).map(Relation::getDescription)
 					.collect(Collectors.joining(","));
 			addCommitPullPush(tablesName, message, name);
 			if (windy) {
@@ -133,8 +132,20 @@ public class BackEndService {
 		}
 	}
 
-	void checkout(String branch, Message message, String gitLocation) {
+	public void checkout(String branch, Message message, String gitLocation) {
 		setMessageAndPushAll("尝试切换分支...", message);
+		boolean result = gitService.checkout(branch, message, gitLocation);
+		setMessageAndPushAll("结果:" + result, message);
+		if (!result) {
+			throw new AutoTableInterruptException();
+		}
+	}
+
+	/**
+	 * 前端用
+	 */
+	public void checkout(String branch, Message message, String gitLocation, ProjectType type) {
+		setMessageAndPushAll(type + "尝试切换分支...", message);
 		boolean result = gitService.checkout(branch, message, gitLocation);
 		setMessageAndPushAll("结果:" + result, message);
 		if (!result) {

@@ -30,4 +30,10 @@ public class RelationController {
 	public List<Relation> insertRelation(@RequestBody List<Relation> relation) {
 		return relationService.saveAll(relation);
 	}
+
+	@PostMapping(value = "/delRelation")
+	public Boolean delRelation(@RequestBody List<Relation> relation) {
+		relationService.deleteAll(relation);
+		return true;
+	}
 }

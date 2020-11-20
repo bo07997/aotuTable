@@ -150,7 +150,7 @@ public class GitService {
 	 * 提交
 	 */
 	public GitService commit(Git git, String info) throws GitAPIException {
-		git.commit().setMessage("MOD <自动导表> " + info).call();
+		git.commit().setMessage("Mod <自动导表> " + info).call();
 		return this;
 	}
 
