@@ -171,7 +171,7 @@ public class BackEndService {
 			BackEndService.setMessageAndPushAll("无后端导表...", message);
 			return;
 		}
-		List<String> tables = Arrays.stream(relation.getBackEndTable().split(BackEndService.REGEX))
+		List<String> tables = Arrays.stream(relation.getBackEndTable().split(BackEndService.REGEX_2))
 				.collect(Collectors.toList());
 		boolean result = tableService.table1(tables, relation.getId());
 		BackEndService.setMessageAndPushAll("结果:" + result, message);
