@@ -1,6 +1,7 @@
 package com.baitian.autotable.service.table.service;
 
 import com.baitian.autotable.util.CmdUtil;
+import com.baitian.autotable.util.result.CmdResult;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,7 @@ public class TableService {
 	 * @param id
 	 * @return boolean
 	 */
-	public boolean table1(List<String> tables, int id) {
+	public CmdResult table1(List<String> tables, int id) {
 		String command = getJarCommand(tables);
 		name2Times.putIfAbsent(id, 0);
 		name2Times.computeIfPresent(id, (k, v) -> v + 1);
@@ -60,7 +61,7 @@ public class TableService {
 	 * @param cmd cmd
 	 * @return boolean
 	 */
-	public boolean table3(String cmd, String location) {
+	public CmdResult table3(String cmd, String location) {
 		return CmdUtil.executeCommand(cmd, location);
 	}
 }

@@ -10,6 +10,7 @@ import com.baitian.autotable.service.tf.service.TFService;
 import com.baitian.autotable.service.type.ProjectType;
 import com.baitian.autotable.service.type.TableType;
 import com.baitian.autotable.util.exception.AutoTableInterruptException;
+import com.baitian.autotable.util.result.CmdResult;
 import com.baitian.autotable.webscoket.bean.Message;
 import com.baitian.autotable.webscoket.server.WebSocketServer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,7 +90,11 @@ public class BackEndService {
 			}
 			checkout(branch, message);
 			getAll(message);
-			autoTableIdList.stream().map(back2Relation::get).forEach(rl -> table1(rl, message));
+			if (autoTableIdList.stream().map(back2Relation::get).anyMatch(rl -> !table1(rl, message))) {
+				message.putMsg("导表过程中遇到错误");
+				message.putResult(CodeConfig.ERROR);
+				return message;
+			}
 			long ts = System.currentTimeMillis();
 			checkChange(message);
 			String tablesName = autoTableIdList.stream().map(back2Relation::get).map(Relation::getDescription)
@@ -165,16 +170,17 @@ public class BackEndService {
 		}
 	}
 
-	void table1(Relation relation, Message message) {
+	boolean table1(Relation relation, Message message) {
 		BackEndService.setMessageAndPushAll("开始后端导表...", message);
 		if (StringUtils.isEmpty(relation.getBackEndTable())) {
 			BackEndService.setMessageAndPushAll("无后端导表...", message);
-			return;
+			return false;
 		}
 		List<String> tables = Arrays.stream(relation.getBackEndTable().split(BackEndService.REGEX_2))
 				.collect(Collectors.toList());
-		boolean result = tableService.table1(tables, relation.getId());
-		BackEndService.setMessageAndPushAll("结果:" + result, message);
+		CmdResult result = tableService.table1(tables, relation.getId());
+		BackEndService.setMessageAndPushAll("结果:" + result.toMessage(), message);
+		return result.isSuccess();
 	}
 
 	void checkChange(Message message) {
@@ -196,6 +202,15 @@ public class BackEndService {
 	public static void setMessageAndPushAll(String str, Message message) {
 		synchronized (message.getSessionId()) {
 			message.putResult(CodeConfig.SUCCESS);
+			message.putMsg(str);
+			WebSocketServer.sendAll(message);
+			message.clearMsg();
+		}
+	}
+
+	public static void setMessageAndPushAll(String code, String str, Message message) {
+		synchronized (message.getSessionId()) {
+			message.putResult(code);
 			message.putMsg(str);
 			WebSocketServer.sendAll(message);
 			message.clearMsg();

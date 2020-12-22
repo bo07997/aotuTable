@@ -20,9 +20,8 @@ import java.util.Set;
  */
 public class TestTF {
 	public static void main(String[] args) {
-		CmdUtil.executeCommand(
-				"tf get /recursive "
-						+ "E:\\vstsworkspace\\projectX\\source\\tools\\excelFactory");
+		CmdUtil.executeCommandOut(
+				"java -jar E:\\vstsworkspace\\projectX\\source\\tools\\excelFactory\\excelFactory.jar -cmd E:\\vstsworkspace\\projectX\\source\\tools\\excelFactory\\monsterteam2.xml");
 		System.out.println("ss");
 	}
 

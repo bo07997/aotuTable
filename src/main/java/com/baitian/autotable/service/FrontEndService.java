@@ -10,6 +10,7 @@ import com.baitian.autotable.service.type.FrontType;
 import com.baitian.autotable.service.type.ProjectType;
 import com.baitian.autotable.service.type.TableType;
 import com.baitian.autotable.util.exception.AutoTableInterruptException;
+import com.baitian.autotable.util.result.CmdResult;
 import com.baitian.autotable.webscoket.bean.Message;
 import com.baitian.autotable.webscoket.server.WebSocketServer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,9 +102,9 @@ public class FrontEndService {
 		String[] types = relation.getFrontEndType().split(BackEndService.REGEX_2);
 		for (int i = 0; i < tables.length; i++) {
 			FrontType frontType = FrontType.parse(Integer.parseInt(types.length > i ? types[i] : types[0]));
-			boolean result = tableService.table3(frontType.getCmd(tables[i]), frontType.location);
-			BackEndService.setMessageAndPushAll("结果:" + result, message);
-			if (!result) {
+			CmdResult result = tableService.table3(frontType.getCmd(tables[i]), frontType.location);
+			BackEndService.setMessageAndPushAll("结果:" + result.toMessage(), message);
+			if (!result.isSuccess()) {
 				throw new AutoTableInterruptException();
 			}
 		}
