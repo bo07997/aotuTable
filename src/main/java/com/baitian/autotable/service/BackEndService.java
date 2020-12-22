@@ -38,6 +38,8 @@ public class BackEndService {
 	public static final String REGEX_2 = "#";
 	@Value("${com.baitian.autotable.git.Location}")
 	public String gitLocation;
+	@Value("${com.baitian.autotable.table.allLocation}")
+	public String tableLocation;
 	@Autowired
 	private TableService tableService;
 	@Autowired
@@ -89,6 +91,7 @@ public class BackEndService {
 				return message;
 			}
 			checkout(branch, message);
+			getUtil(tableLocation);
 			getAll(message);
 			if (autoTableIdList.stream().map(back2Relation::get).anyMatch(rl -> !table1(rl, message))) {
 				message.putMsg("导表过程中遇到错误");
@@ -158,10 +161,13 @@ public class BackEndService {
 		}
 	}
 
+	void getUtil(String tableLocation) {
+		//导表工具更新,自带增量
+		tfService.getAllTable(tableLocation);
+	}
+
 	void getAll(Message message) {
 		setMessageAndPushAll("开始拉取文件...", message);
-		//导表工具更新,自带增量
-		tfService.getAllTable();
 		//拉取产品文件
 		boolean result = tfService.getAll();
 		setMessageAndPushAll("结果:" + result, message);

@@ -12,8 +12,6 @@ import org.springframework.stereotype.Service;
 public class TFService {
 	@Value("${com.baitian.autotable.tf.allLocation}")
 	public String allLocation;
-	@Value("${com.baitian.autotable.table.allLocation}")
-	public String tableLocation;
 	@Value("${com.baitian.autotable.tf.exeLocation}")
 	public String exeLocation;
 
@@ -22,7 +20,7 @@ public class TFService {
 		return CmdUtil.executeCommand(command);
 	}
 
-	public boolean getAllTable() {
+	public boolean getAllTable(String tableLocation) {
 		String command = getCommand(tableLocation);
 		return CmdUtil.executeCommand(command);
 	}
