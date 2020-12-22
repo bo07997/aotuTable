@@ -99,6 +99,10 @@ public class FrontEndService {
 			return;
 		}
 		String[] tables = relation.getFrontEndTable().split(BackEndService.REGEX_2);
+		if (relation.getFrontEndType() == null) {
+			BackEndService.setMessageAndPushAll(relation.getId() + "前端导表类型设置错误...", message);
+			return;
+		}
 		String[] types = relation.getFrontEndType().split(BackEndService.REGEX_2);
 		for (int i = 0; i < tables.length; i++) {
 			FrontType frontType = FrontType.parse(Integer.parseInt(types.length > i ? types[i] : types[0]));
