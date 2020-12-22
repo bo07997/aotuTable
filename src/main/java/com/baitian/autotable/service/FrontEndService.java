@@ -103,7 +103,8 @@ public class FrontEndService {
 		for (int i = 0; i < tables.length; i++) {
 			FrontType frontType = FrontType.parse(Integer.parseInt(types.length > i ? types[i] : types[0]));
 			CmdResult result = tableService.table3(frontType.getCmd(tables[i]), frontType.location);
-			BackEndService.setMessageAndPushAll("结果:" + result.toMessage(), message);
+			//SUCCESS_0 不确定状态 因为cmd范围的状态码只是正常退出的
+			BackEndService.setMessageAndPushAll(CodeConfig.SUCCESS_0, "结果:" + result.toMessage(), message);
 			if (!result.isSuccess()) {
 				throw new AutoTableInterruptException();
 			}

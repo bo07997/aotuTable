@@ -41,7 +41,7 @@ public class CmdUtil {
 			while ((line = br.readLine()) != null) {
 				builder.append(line);
 			}
-			return new CmdResult(p.exitValue() == 0 && builder.length() == 0, builder.toString());
+			return new CmdResult(p.exitValue() == 0, builder.toString());
 		} catch (Exception e) {
 			System.out.println("execute command error. command:" + command);
 			System.out.println("exception:" + e);
@@ -52,7 +52,7 @@ public class CmdUtil {
 	//测试
 	public static boolean executeCommandOut(String command) {
 		try {
-			Process p = Runtime.getRuntime().exec("ipconfig");
+			Process p = Runtime.getRuntime().exec(command);
 			InputStream stdin = p.getErrorStream();
 			InputStreamReader isr = new InputStreamReader(stdin, "GB2312");
 			BufferedReader br = new BufferedReader(isr);

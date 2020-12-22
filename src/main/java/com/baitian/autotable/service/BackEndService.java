@@ -179,7 +179,7 @@ public class BackEndService {
 		List<String> tables = Arrays.stream(relation.getBackEndTable().split(BackEndService.REGEX_2))
 				.collect(Collectors.toList());
 		CmdResult result = tableService.table1(tables, relation.getId());
-		BackEndService.setMessageAndPushAll("结果:" + result.toMessage(), message);
+		BackEndService.setMessageAndPushAll(CodeConfig.SUCCESS_0, "结果:" + result.toMessage(), message);
 		return result.isSuccess();
 	}
 

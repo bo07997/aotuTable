@@ -23,6 +23,6 @@ public class CmdResult {
 	}
 
 	public String toMessage() {
-		return success + (success ? "" : errorMessage);
+		return success + " |message:" + errorMessage;
 	}
 }

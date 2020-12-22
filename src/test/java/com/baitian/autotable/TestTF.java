@@ -31,7 +31,7 @@ public class TestTF {
 	private TFService tfService;
 	@Test
 	public void testGit() {
-		CmdUtil.executeCommand(
+		CmdUtil.executeCommandOut(
 				"tf get /recursive "
 						+ "E:\\vstsworkspace\\projectX\\source\\tools\\excelFactory");
 		System.out.println("ss");
