@@ -14,16 +14,19 @@ public enum FrontType {
 	FF(
 			1,
 			"java -jar File2File.jar -k  %s -gn",
-			"E:\\vstsworkspace\\projectX\\source\\tools\\File2File\\jarexport\\"),
+			"E:\\vstsworkspace\\projectX\\source\\tools\\File2File\\jarexport\\",
+			"E:\\vstsworkspace\\projectX\\source\\tools\\"),
 	;
 	public int id;
 	String cmd;
 	public String location;
+	public String getLocation;
 
-	FrontType(int id, String cmd, String location) {
+	FrontType(int id, String cmd, String location, String getLocation) {
 		this.id = id;
 		this.cmd = cmd;
 		this.location = location;
+		this.getLocation = getLocation;
 	}
 
 	public String getCmd(String table) {

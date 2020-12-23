@@ -78,7 +78,7 @@ public class FrontEndService {
 			}
 			Arrays.stream(ProjectType.values()).forEach(type -> type.checkout(backEndService, message));
 			//更新工具
-			Arrays.stream(FrontType.values()).forEach(ty -> backEndService.getUtil(ty.location));
+			backEndService.getUtil(FrontType.FF.getLocation);
 			//产品文件
 			backEndService.getAll(message);
 			String tablesName = autoTableIdList.stream().map(back2Relation::get).map(Relation::getDescription)

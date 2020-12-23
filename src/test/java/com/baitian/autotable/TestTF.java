@@ -2,6 +2,7 @@ package com.baitian.autotable;
 
 import com.baitian.autotable.service.git.service.GitService;
 import com.baitian.autotable.service.tf.service.TFService;
+import com.baitian.autotable.service.type.FrontType;
 import com.baitian.autotable.util.CmdUtil;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
@@ -20,8 +21,9 @@ import java.util.Set;
  */
 public class TestTF {
 	public static void main(String[] args) {
-		CmdUtil.executeCommandOut(
-				"java -jar E:\\vstsworkspace\\projectX\\source\\tools\\excelFactory\\excelFactory.jar -cmd E:\\vstsworkspace\\projectX\\source\\tools\\excelFactory\\monsterteam2.xml");
+		CmdUtil.executeCommand(
+				"C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\Common7\\IDE\\TF.exe get /recursive "
+						+ FrontType.FF.location);
 		System.out.println("ss");
 	}
 
